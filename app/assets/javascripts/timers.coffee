@@ -120,3 +120,11 @@ $(document).on 'ready', () ->
   window.longRest = $('#timerStatus').data('long-rest')
   window.pomodoroCount = 0
   $('#timerStatus').html("startボタンで作業開始！")
+
+$(document).on 'click', '#end', () ->
+  # メッセージを出して画面遷移させる。
+  $.ajax({
+    url: 'lists/index'
+    type: 'GET'
+    })
+  window.location.href = 'http://localhost:3000/lists/index'

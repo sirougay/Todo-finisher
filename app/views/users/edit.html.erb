@@ -1,0 +1,21 @@
+<!-- そのうち、タイマー本体のページにremote:trueして移したい -->
+<%= form_for @timer do |f| %>
+	<div class="field">
+		<%= f.label :pomodoro, "ポモドーロ" %>
+		<%= f.number_field :pomodoro, value: 25 %>分
+	</div>
+
+	<div class="field">
+		<%= f.label :pomodoro, "小休憩" %>
+		<%= f.number_field :short_rest, value: 5 %>分
+	</div>
+
+	<div class="field">
+		<%= f.label :pomodoro, "長い休憩" %>
+		<%= f.number_field :long_rest, value: 15 %>分
+	</div>
+
+	<div class="action">
+		<%= f.submit "登録" %>
+	</div>
+<% end %>
