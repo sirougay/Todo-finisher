@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  pomodoro: 1
+  short_rest: 1
+  long_rest: 1
+  user: one
+
+two:
+  pomodoro: 1
+  short_rest: 1
+  long_rest: 1
+  user: two
