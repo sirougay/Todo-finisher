@@ -13,6 +13,7 @@ pomodoroTimer = () ->
     else if remainingTime <= 0
       window.startTime = Date.now()
       window.pomodoroCount += 1
+      window.restAudio.play()
       clearTimeout(TimeoutId)
       if window.pomodoroCount % 4 is 0
         $('#timerStatus').html("大休憩")
@@ -27,12 +28,12 @@ pomodoroTimer = () ->
   , 100
   $(document).on 'click', '#stop' , () ->
     clearTimeout(TimeoutId)
-  	if window.stopTime is undefined
+    if window.stopTime is undefined
       window.stopTime = Date.now()
   $(document).on 'click', '#reset' , () ->
     window.startTime = undefined
     window.stopTime = undefined
-    $('#timerText').html(window.pomodoro + "分")
+    $('#timerText').html((window.pomodoro / 60) + "分")
     clearTimeout(TimeoutId)
 
 shortRestTimer = () ->
@@ -49,6 +50,7 @@ shortRestTimer = () ->
       shortRestTimer()
     else if remainingTime <= 0
       window.startTime = Date.now()
+      window.startAudio.play()
       clearTimeout(TimeoutId)
       $('#timerStatus').html("作業中")
       $('#timerStatus').removeClass("short-rest")
@@ -79,6 +81,7 @@ longRestTimer = () ->
       longRestTimer()
     else if remainingTime <= 0
       window.startTime = Date.now()
+      window.startAudio.play()
       clearTimeout(TimeoutId)
       $('#timerStatus').html("作業中")
       $('#timerStatus').removeClass("long-rest")
@@ -97,14 +100,14 @@ longRestTimer = () ->
 
 $(document).on 'click', '#start' , () ->
   # スタートボタンを初めて押されたとき
-	if window.startTime is undefined
-  	window.startTime = Date.now()
+  if window.startTime is undefined
+    window.startTime = Date.now()
   # ストップボタンを押されずにスタートボタンを押されたとき
   else if window.stopTime is undefined
   # ストップボタンを押されてタイマーが停止中のとき
   else
-  	window.startTime = window.startTime + (Date.now() - window.stopTime)
-  	window.stopTime = undefined
+    window.startTime = window.startTime + (Date.now() - window.stopTime)
+    window.stopTime = undefined
   if $('#timerStatus.short-rest').length
     shortRestTimer()
   else if $('#timerStatus.long-rest').length
@@ -112,13 +115,16 @@ $(document).on 'click', '#start' , () ->
   else
     $('#timerStatus').html("作業中")
     $('#timerStatus').addClass("pomodoro-now")
+    window.startAudio.play()
     pomodoroTimer()
 
 $(document).on 'ready', () ->
   window.pomodoro = $('#timerStatus').data('pomodoro')
-  window.shortRest = $('#timerStatus').data('short-rest')
+  window.shortRest =  $('#timerStatus').data('short-rest')
   window.longRest = $('#timerStatus').data('long-rest')
   window.pomodoroCount = 0
+  window.restAudio = new Audio('/assets/se_maoudamashii_onepoint26.wav')
+  window.startAudio = new Audio('/assets/se_maoudamashii_system23.wav')
   $('#timerStatus').html("startボタンで作業開始！")
 
 $(document).on 'click', '#end', () ->
@@ -127,4 +133,4 @@ $(document).on 'click', '#end', () ->
     url: 'lists/index'
     type: 'GET'
     })
-  window.location.href = 'http://localhost:3000/lists/index'
+  window.location.href = 'http://localhost:3000/'
