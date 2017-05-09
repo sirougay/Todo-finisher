@@ -6,4 +6,5 @@ class User < ApplicationRecord
 
   has_one :timer, dependent: :destroy
   has_many :tasks
+  has_many :diaries
 end

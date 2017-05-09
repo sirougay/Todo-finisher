@@ -15,6 +15,7 @@
       <%= current_user.email %>　としてログインしています。
       <%= link_to "ログアウト", destroy_user_session_path, :method => :delete %>
       <%= link_to "プロフィール編集", edit_user_path(current_user) %>
+      <%= link_to "タスク一覧", tasks_path %>
     <% else %>
       <%= link_to "サインアップ", new_user_registration_path %>
       <%= link_to "ログイン", new_user_session_path %>

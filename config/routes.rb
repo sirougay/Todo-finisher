@@ -6,4 +6,7 @@ Rails.application.routes.draw do
   get "/timer" => "timers#show"
   resources :users, only:[:edit]
   resources :timers
+  resources :diaries
+  resources :tasks
+  post "/tasks/sort" => "tasks#sort"
 end

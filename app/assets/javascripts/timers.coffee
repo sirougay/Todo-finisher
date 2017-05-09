@@ -1,3 +1,18 @@
+stopTimer = (TimeoutId) ->
+  window.stopTime = Date.now()
+  clearTimeout(TimeoutId)
+  #一時停止ボタンを再開ボタンにする
+  $('#stop').html("再開")
+  $('#stop').attr('id', "start")
+
+resetTimer = (TimeoutId) ->
+  window.startTime = undefined
+  window.stopTime = undefined
+  clearTimeout(TimeoutId)
+  if $('#stop').length
+    $('#stop').html("開始！")
+    $('#stop').attr('id', "start")
+
 pomodoroTimer = () ->
   TimeoutId = setTimeout ->
     t = (Date.now() - window.startTime) / 1000
@@ -27,14 +42,10 @@ pomodoroTimer = () ->
         shortRestTimer()
   , 100
   $(document).on 'click', '#stop' , () ->
-    clearTimeout(TimeoutId)
-    if window.stopTime is undefined
-      window.stopTime = Date.now()
+    stopTimer(TimeoutId)
   $(document).on 'click', '#reset' , () ->
-    window.startTime = undefined
-    window.stopTime = undefined
+    resetTimer(TimeoutId)
     $('#timerText').html((window.pomodoro / 60) + "分")
-    clearTimeout(TimeoutId)
 
 shortRestTimer = () ->
   TimeoutId = setTimeout ->
@@ -58,14 +69,10 @@ shortRestTimer = () ->
       pomodoroTimer()
   , 100
   $(document).on 'click', '#stop' , () ->
-    clearTimeout(TimeoutId)
-    if window.stopTime is undefined
-      window.stopTime = Date.now()
+    stopTimer(TimeoutId)
   $(document).on 'click', '#reset' , () ->
-    window.startTime = undefined
-    window.stopTime = undefined
+    resetTimer(TimeoutId)
     $('#timerText').html(window.shortRest + "分")
-    clearTimeout(TimeoutId)
 
 longRestTimer = () ->
   TimeoutId = setTimeout ->
@@ -89,25 +96,20 @@ longRestTimer = () ->
       pomodoroTimer()
   , 100
   $(document).on 'click', '#stop' , () ->
-    clearTimeout(TimeoutId)
-    if window.stopTime is undefined
-      window.stopTime = Date.now()
+    stopTimer(TimeoutId)
   $(document).on 'click', '#reset' , () ->
-    window.startTime = undefined
-    window.stopTime = undefined
-    $('#timerText').html(window.shortRest + "分")
-    clearTimeout(TimeoutId)
+    resetTimer(TimeoutId)
+    $('#timerText').html(window.longRest + "分")
 
 $(document).on 'click', '#start' , () ->
-  # スタートボタンを初めて押されたとき
+  # 開始ボタンを押されたとき
   if window.startTime is undefined
     window.startTime = Date.now()
-  # ストップボタンを押されずにスタートボタンを押されたとき
-  else if window.stopTime is undefined
-  # ストップボタンを押されてタイマーが停止中のとき
+  # ストップボタンを押されてタイマー停止中に、再開ボタンを押されたとき
   else
     window.startTime = window.startTime + (Date.now() - window.stopTime)
     window.stopTime = undefined
+  # 作動中のタイマーの種類によって分ける
   if $('#timerStatus.short-rest').length
     shortRestTimer()
   else if $('#timerStatus.long-rest').length
@@ -117,6 +119,9 @@ $(document).on 'click', '#start' , () ->
     $('#timerStatus').addClass("pomodoro-now")
     window.startAudio.play()
     pomodoroTimer()
+  # 開始ボタンを一時停止ボタンにする
+  $('#start').html("一時停止")
+  $('#start').attr('id', "stop")
 
 $(document).on 'ready', () ->
   window.pomodoro = $('#timerStatus').data('pomodoro')
@@ -125,7 +130,7 @@ $(document).on 'ready', () ->
   window.pomodoroCount = 0
   window.restAudio = new Audio('/assets/se_maoudamashii_onepoint26.wav')
   window.startAudio = new Audio('/assets/se_maoudamashii_system23.wav')
-  $('#timerStatus').html("startボタンで作業開始！")
+  $('#timerStatus').html("作業を始めよう！")
 
 $(document).on 'click', '#end', () ->
   # メッセージを出して画面遷移させる。
