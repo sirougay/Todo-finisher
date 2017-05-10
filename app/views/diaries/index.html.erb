@@ -1,0 +1,9 @@
+<% @diaries.each do |diary| %>
+  <div>
+    <% if diary.tasks.length > 0 or diary.content != nil %>
+      <%= link_to diary.created_at.to_s(:date), diary %>
+    <% else %>
+      <%= diary.created_at.to_s(:date) %>
+    <% end %>
+  </div>
+<% end %>

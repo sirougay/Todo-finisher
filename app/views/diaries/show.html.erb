@@ -1,0 +1,21 @@
+<% if 1==2 %>
+  <p>
+    まだ本日の記録はありません。
+  </p>
+<% else %>
+
+  <h2>
+    完了したタスク
+  </h2>
+  <% @diary.tasks.each do |task| %>
+    <p>
+      <%= task.content %>
+    </p>
+  <% end %>
+
+<% end %>
+
+<%= form_for(@diary) do |f| %>
+  <%= f.text_area :content %>
+  <%= f.submit "保存" %>
+<% end %>

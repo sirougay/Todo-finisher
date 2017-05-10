@@ -33,7 +33,6 @@ gem 'jbuilder', '~> 2.5'
 # gem 'bcrypt', '~> 3.1.7'
 gem 'devise', '~> 4.2.0'
 gem 'jquery-ui-rails'
-gem 'jquery-turbolinks'
 gem 'acts_as_list'
 gem 'bootstrap-sass'
 

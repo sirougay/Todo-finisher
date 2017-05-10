@@ -1,6 +1,7 @@
 class TasksController < ApplicationController
 	before_action :authenticate_user!
 	before_action :set_tasks, only:[:index, :sort, :create]
+	before_action :set_task, only:[:destroy, :done]
 
 	def index
 		@task = Task.new
@@ -28,8 +29,15 @@ class TasksController < ApplicationController
 	end
 
 	def destroy
-		@task = Task.find(params[:id])
 		@task.destroy
+		redirect_to tasks_path
+	end
+
+	def done
+		diary = current_user.diaries.where(created_at: Time.now.all_day).first_or_create
+		@task.diary_id = diary.id
+		@task.status = true
+		@task.save
 		redirect_to tasks_path
 	end
 
@@ -39,6 +47,10 @@ class TasksController < ApplicationController
 		end
 
 		def set_tasks
-			@tasks = current_user.tasks.order(:position)
+			@tasks = current_user.tasks.where(status: false).order(:position)
+		end
+
+		def set_task
+			@task = current_user.tasks.find(params[:id])
 		end
 end

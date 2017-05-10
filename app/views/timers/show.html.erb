@@ -1,7 +1,7 @@
 <h1>ストップウォッチ</h1>
 <h2 id="timerStatus" data-pomodoro='<%=@timer.pomodoro%>' data-short-rest='<%=@timer.short_rest%>' data-long-rest='<%=@timer.long_rest%>'></h2>
 <p id="timerText"><%=@timer.pomodoro/60%>分</p>
-<button id="start">開始！</button>
+<button id="start"></button>
 <button id="reset">リセット</button>
 <% if user_signed_in? %>
 	<button id="end">終了</button>

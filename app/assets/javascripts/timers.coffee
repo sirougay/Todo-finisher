@@ -13,19 +13,25 @@ resetTimer = (TimeoutId) ->
     $('#stop').html("開始！")
     $('#stop').attr('id', "start")
 
+setRemainingTime = (status) ->
+  # リセット後のturbolinksによる誤作動防止
+  if window.startTime is undefined
+    window.startTime = Date.now()
+  t = (Date.now() - window.startTime) / 1000
+  @remainingTime = status - t
+  @min = Math.floor( @remainingTime / 60 )
+  @sec = Math.floor( @remainingTime - min*60 )
+
 pomodoroTimer = () ->
   TimeoutId = setTimeout ->
-    t = (Date.now() - window.startTime) / 1000
-    remainingTime = window.pomodoro - t
-    if remainingTime >= 60
-      min = Math.floor( remainingTime / 60 )
-      sec = Math.floor( remainingTime - min*60 )
-      $('#timerText').html("#{min}分 #{sec}秒")
+    setRemainingTime(window.pomodoro)
+    if @remainingTime >= 60
+      $('#timerText').html("#{@min}分 #{@sec}秒")
       pomodoroTimer()
-    else if remainingTime > 0
-      $('#timerText').html( Math.floor(remainingTime)+ "秒" )
+    else if @remainingTime > 0
+      $('#timerText').html( "#{@sec}秒" )
       pomodoroTimer()
-    else if remainingTime <= 0
+    else if @remainingTime <= 0
       window.startTime = Date.now()
       window.pomodoroCount += 1
       window.restAudio.play()
@@ -46,18 +52,25 @@ pomodoroTimer = () ->
   $(document).on 'click', '#reset' , () ->
     resetTimer(TimeoutId)
     $('#timerText').html((window.pomodoro / 60) + "分")
+  $(document).on 'turbolinks:load', () =>
+    stopTimer(TimeoutId)
+    $('#timerStatus').html("作業中")
+    $('#timerStatus').addClass("pomodoro-now")
+    $('#start').html("再開")
+    setRemainingTime(window.pomodoro)
+    if @remainingTime >= 60
+      $('#timerText').html("#{@min}分 #{@sec}秒")
+    else
+      $('#timerText').html("#{@sec}秒")
 
 shortRestTimer = () ->
   TimeoutId = setTimeout ->
-    t = (Date.now() - window.startTime) / 1000
-    remainingTime = window.shortRest - t
-    if remainingTime >= 60
-      min = Math.floor( remainingTime / 60 )
-      sec = Math.floor( remainingTime - min*60 )
-      $('#timerText').html("#{min}分 #{sec}秒")
+    setRemainingTime(window.shortRest)
+    if @remainingTime >= 60
+      $('#timerText').html("#{@min}分 #{@sec}秒")
       shortRestTimer()
     else if remainingTime > 0
-      $('#timerText').html( Math.floor(remainingTime)+ "秒" )
+      $('#timerText').html( "#{@sec}秒" )
       shortRestTimer()
     else if remainingTime <= 0
       window.startTime = Date.now()
@@ -73,18 +86,25 @@ shortRestTimer = () ->
   $(document).on 'click', '#reset' , () ->
     resetTimer(TimeoutId)
     $('#timerText').html(window.shortRest + "分")
+  $(document).on 'turbolinks:load', () =>
+    stopTimer(TimeoutId)
+    $('#timerStatus').html("小休憩")
+    $('#timerStatus').addClass("short-rest")
+    $('#start').html("再開")
+    setRemainingTime(window.shortRest)
+    if @remainingTime >= 60
+      $('#timerText').html("#{@min}分 #{@sec}秒")
+    else
+      $('#timerText').html("#{@sec}秒")
 
 longRestTimer = () ->
   TimeoutId = setTimeout ->
-    t = (Date.now() - window.startTime) / 1000
-    remainingTime = window.longRest - t
-    if remainingTime >= 60
-      min = Math.floor( remainingTime / 60 )
-      sec = Math.floor( remainingTime - min*60 )
-      $('#timerText').html("#{min}分 #{sec}秒")
+    setRemainingTime(window.longRest)
+    if @remainingTime >= 60
+      $('#timerText').html("#{@min}分 #{@sec}秒")
       longRestTimer()
     else if remainingTime > 0
-      $('#timerText').html( Math.floor(remainingTime)+ "秒" )
+      $('#timerText').html( "#{@sec}秒" )
       longRestTimer()
     else if remainingTime <= 0
       window.startTime = Date.now()
@@ -100,15 +120,24 @@ longRestTimer = () ->
   $(document).on 'click', '#reset' , () ->
     resetTimer(TimeoutId)
     $('#timerText').html(window.longRest + "分")
+  $(document).on 'turbolinks:load', () =>
+    stopTimer(TimeoutId)
+    $('#timerStatus').html("大休憩")
+    $('#timerStatus').addClass("long-rest")
+    $('#start').html("再開")
+    setRemainingTime(window.longRest)
+    if @remainingTime >= 60
+      $('#timerText').html("#{@min}分 #{@sec}秒")
+    else
+      $('#timerText').html("#{@sec}秒")
 
 $(document).on 'click', '#start' , () ->
   # 開始ボタンを押されたとき
   if window.startTime is undefined
     window.startTime = Date.now()
-  # ストップボタンを押されてタイマー停止中に、再開ボタンを押されたとき
+  # タイマー停止中に再開ボタンを押されたとき
   else
     window.startTime = window.startTime + (Date.now() - window.stopTime)
-    window.stopTime = undefined
   # 作動中のタイマーの種類によって分ける
   if $('#timerStatus.short-rest').length
     shortRestTimer()
@@ -123,14 +152,17 @@ $(document).on 'click', '#start' , () ->
   $('#start').html("一時停止")
   $('#start').attr('id', "stop")
 
-$(document).on 'ready', () ->
-  window.pomodoro = $('#timerStatus').data('pomodoro')
-  window.shortRest =  $('#timerStatus').data('short-rest')
-  window.longRest = $('#timerStatus').data('long-rest')
-  window.pomodoroCount = 0
-  window.restAudio = new Audio('/assets/se_maoudamashii_onepoint26.wav')
-  window.startAudio = new Audio('/assets/se_maoudamashii_system23.wav')
+$(document).on 'ready turbolinks:load', () ->
+  $('#start').html("開始！")
   $('#timerStatus').html("作業を始めよう！")
+  #初回
+  if window.pomodoro is undefined
+    window.pomodoro = $('#timerStatus').data('pomodoro')
+    window.shortRest =  $('#timerStatus').data('short-rest')
+    window.longRest = $('#timerStatus').data('long-rest')
+    window.pomodoroCount = 0
+    window.restAudio = new Audio('/assets/se_maoudamashii_onepoint26.wav')
+    window.startAudio = new Audio('/assets/se_maoudamashii_system23.wav')
 
 $(document).on 'click', '#end', () ->
   # メッセージを出して画面遷移させる。

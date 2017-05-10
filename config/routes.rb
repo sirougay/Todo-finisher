@@ -9,4 +9,5 @@ Rails.application.routes.draw do
   resources :diaries
   resources :tasks
   post "/tasks/sort" => "tasks#sort"
+  patch "/tasks/:id/done" => "tasks#done", as: :done_task
 end

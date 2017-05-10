@@ -1,8 +1,11 @@
 <br>
 <ul id="tasks" class="list-group sortable-table">
 	<% @tasks.each do |task| %>
-		<li id="position_<%=task.position%>" class="list-group-item"><%= task.content %>
-		<%= link_to "削除", task, method: :delete, data:{confirm: "本当に削除しますか？"} %></li>
+		<li id="position_<%=task.position%>" class="list-group-item">
+      <%= task.content %>
+		  <%= link_to "削除", task, method: :delete, data:{confirm: "本当に削除しますか？"} %>
+      <%= link_to "完了", done_task_path(task.id), method: :patch, data:{confirm: "完了しますか？"} %>
+    </li>
 	<% end %>
 </ul>
 
@@ -10,6 +13,3 @@
 	<%= f.text_field :content, placeholder: "やるべきことを追加しよう！", autofocus: true %>
 	<%= f.submit "追加", class: "btn btn-primary" %>
 <% end %>
-
-<!-- 順番がユーザーによって1から割り振られるようにしておいて、ドラッグアンドドロップで振り分けられるようにしておく。 -->
-<!-- indexカラムは、削除が絡むと厄介になるからやめたほうがよさげ？ -->
