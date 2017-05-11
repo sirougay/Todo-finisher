@@ -1,7 +1,7 @@
 class TasksController < ApplicationController
 	before_action :authenticate_user!
 	before_action :set_tasks, only:[:index, :sort, :create]
-	before_action :set_task, only:[:destroy, :done]
+	before_action :set_task, only:[:destroy, :done, :done_at_timer]
 
 	def index
 		@task = Task.new
@@ -17,7 +17,7 @@ class TasksController < ApplicationController
 			task.save
 			ids << task.id
 		end
-		render json: {status: 'success'}
+		render json: {}
 	end
 
 	def create
@@ -39,6 +39,15 @@ class TasksController < ApplicationController
 		@task.status = true
 		@task.save
 		redirect_to tasks_path
+	end
+
+	def done_at_timer
+		diary = current_user.diaries.where(created_at: Time.now.all_day).first_or_create
+		@task.diary_id = diary.id
+		@task.status = true
+		@task.save
+		task = current_user.tasks.where(status: false).order(:position).first
+		render json: {content: task.content, id: task.id}
 	end
 
 	private

@@ -153,21 +153,29 @@ $(document).on 'click', '#start' , () ->
   $('#start').attr('id', "stop")
 
 $(document).on 'ready turbolinks:load', () ->
-  $('#start').html("開始！")
-  $('#timerStatus').html("作業を始めよう！")
-  #初回
-  if window.pomodoro is undefined
+  #turbolinksによる二重動作の防止
+  unless $('.ready').length
+    $('#timerStatus').addClass("ready")
+    $('#start').html("開始！")
+    $('#timerStatus').html("作業を始めよう！")
     window.pomodoro = $('#timerStatus').data('pomodoro')
     window.shortRest =  $('#timerStatus').data('short-rest')
     window.longRest = $('#timerStatus').data('long-rest')
     window.pomodoroCount = 0
     window.restAudio = new Audio('/assets/se_maoudamashii_onepoint26.wav')
     window.startAudio = new Audio('/assets/se_maoudamashii_system23.wav')
+    if gon.user_signed_in
+      $('#current-task').append("現在のタスク: " + gon.task.content)
+      $('#end').removeClass("hidden")
 
 $(document).on 'click', '#end', () ->
-  # メッセージを出して画面遷移させる。
-  $.ajax({
-    url: 'lists/index'
-    type: 'GET'
-    })
-  window.location.href = 'http://localhost:3000/'
+  if gon.user_signed_in
+    console.log('/tasks/'+gon.task.id+'/done_at_timer')
+    $.ajax({
+      url: '/tasks/'+gon.task.id+'/done_at_timer',
+      type: 'POST',
+      dataType: 'json',
+      success: (data) ->
+        $('#current-task').html("現在のタスク: " + data['content'])
+        gon.task.id = data['id']
+      })

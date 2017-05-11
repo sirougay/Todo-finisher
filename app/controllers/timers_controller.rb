@@ -2,6 +2,13 @@ class TimersController < ApplicationController
 	before_action :set_timer, only:[:show]
 
 	def show
+		if user_signed_in?
+			gon.task = current_user.tasks.where(status: false).order(:position).first
+			@task = current_user.tasks.where(status: false).order(:position).first
+			gon.user_signed_in = true
+		else
+			gon.user_signed_in = false
+		end
 	end
 
 	def create

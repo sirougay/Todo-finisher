@@ -35,7 +35,7 @@ gem 'devise', '~> 4.2.0'
 gem 'jquery-ui-rails'
 gem 'acts_as_list'
 gem 'bootstrap-sass'
-
+gem 'gon'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 

@@ -10,4 +10,5 @@ Rails.application.routes.draw do
   resources :tasks
   post "/tasks/sort" => "tasks#sort"
   patch "/tasks/:id/done" => "tasks#done", as: :done_task
+  post "/tasks/:id/done_at_timer" => "tasks#done_at_timer"
 end
