@@ -5,5 +5,16 @@
 .sortable-table {
   li{
     cursor: move;
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+  }
+}
+
+.sortable-table:active {
+  li{
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
   }
 }

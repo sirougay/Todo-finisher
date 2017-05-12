@@ -7,9 +7,12 @@
   <h2>
     完了したタスク
   </h2>
-  <% @diary.tasks.each do |task| %>
+  <% @tasks.each do |task| %>
     <p>
       <%= task.content %>
+      <% if task.spent_time.present? %>
+        <%= task.spent_time / 1000 %>秒
+      <% end %>
     </p>
   <% end %>
 

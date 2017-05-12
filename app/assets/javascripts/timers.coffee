@@ -8,6 +8,7 @@ stopTimer = (TimeoutId) ->
 resetTimer = (TimeoutId) ->
   window.startTime = undefined
   window.stopTime = undefined
+  window.spentTime = 0
   clearTimeout(TimeoutId)
   if $('#stop').length
     $('#stop').html("開始！")
@@ -24,6 +25,7 @@ setRemainingTime = (status) ->
 
 pomodoroTimer = () ->
   TimeoutId = setTimeout ->
+    window.spentTime += 100
     setRemainingTime(window.pomodoro)
     if @remainingTime >= 60
       $('#timerText').html("#{@min}分 #{@sec}秒")
@@ -53,15 +55,12 @@ pomodoroTimer = () ->
     resetTimer(TimeoutId)
     $('#timerText').html((window.pomodoro / 60) + "分")
   $(document).on 'turbolinks:load', () =>
-    stopTimer(TimeoutId)
+    if window.stopTime is undefined
+      stopTimer(TimeoutId)
     $('#timerStatus').html("作業中")
     $('#timerStatus').addClass("pomodoro-now")
     $('#start').html("再開")
-    setRemainingTime(window.pomodoro)
-    if @remainingTime >= 60
-      $('#timerText').html("#{@min}分 #{@sec}秒")
-    else
-      $('#timerText').html("#{@sec}秒")
+    $('#timerText').html("一時中断中")
 
 shortRestTimer = () ->
   TimeoutId = setTimeout ->
@@ -87,15 +86,12 @@ shortRestTimer = () ->
     resetTimer(TimeoutId)
     $('#timerText').html(window.shortRest + "分")
   $(document).on 'turbolinks:load', () =>
-    stopTimer(TimeoutId)
+    if window.stopTime is undefined
+      stopTimer(TimeoutId)
     $('#timerStatus').html("小休憩")
     $('#timerStatus').addClass("short-rest")
     $('#start').html("再開")
-    setRemainingTime(window.shortRest)
-    if @remainingTime >= 60
-      $('#timerText').html("#{@min}分 #{@sec}秒")
-    else
-      $('#timerText').html("#{@sec}秒")
+    $('#timerText').html("一時中断中")
 
 longRestTimer = () ->
   TimeoutId = setTimeout ->
@@ -121,15 +117,12 @@ longRestTimer = () ->
     resetTimer(TimeoutId)
     $('#timerText').html(window.longRest + "分")
   $(document).on 'turbolinks:load', () =>
-    stopTimer(TimeoutId)
+    if window.stopTime is undefined
+      stopTimer(TimeoutId)
     $('#timerStatus').html("大休憩")
     $('#timerStatus').addClass("long-rest")
     $('#start').html("再開")
-    setRemainingTime(window.longRest)
-    if @remainingTime >= 60
-      $('#timerText').html("#{@min}分 #{@sec}秒")
-    else
-      $('#timerText').html("#{@sec}秒")
+    $('#timerText').html("一時中断中")
 
 $(document).on 'click', '#start' , () ->
   # 開始ボタンを押されたとき
@@ -151,6 +144,7 @@ $(document).on 'click', '#start' , () ->
   # 開始ボタンを一時停止ボタンにする
   $('#start').html("一時停止")
   $('#start').attr('id', "stop")
+  window.stopTime = undefined
 
 $(document).on 'ready turbolinks:load', () ->
   #turbolinksによる二重動作の防止
@@ -164,18 +158,24 @@ $(document).on 'ready turbolinks:load', () ->
     window.pomodoroCount = 0
     window.restAudio = new Audio('/assets/se_maoudamashii_onepoint26.wav')
     window.startAudio = new Audio('/assets/se_maoudamashii_system23.wav')
+    if window.spentTime is undefined
+      window.spentTime = 0
     if gon.user_signed_in
       $('#current-task').append("現在のタスク: " + gon.task.content)
       $('#end').removeClass("hidden")
 
 $(document).on 'click', '#end', () ->
   if gon.user_signed_in
-    console.log('/tasks/'+gon.task.id+'/done_at_timer')
+    console.log(window.spentTime)
     $.ajax({
       url: '/tasks/'+gon.task.id+'/done_at_timer',
       type: 'POST',
       dataType: 'json',
+      data: {
+        "spent_time": window.spentTime
+      }, 
       success: (data) ->
         $('#current-task').html("現在のタスク: " + data['content'])
         gon.task.id = data['id']
+        window.spentTime = 0
       })

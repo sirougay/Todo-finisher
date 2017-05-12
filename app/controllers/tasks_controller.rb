@@ -25,7 +25,7 @@ class TasksController < ApplicationController
 		@task.status = false
 		@task.position = @tasks.last.position + 1
 		@task.save
-		render json: {content: @task.content, position: @task.position}
+		render json: {content: @task.content, position: @task.position, id: @task.id}
 	end
 
 	def destroy
@@ -45,6 +45,7 @@ class TasksController < ApplicationController
 		diary = current_user.diaries.where(created_at: Time.now.all_day).first_or_create
 		@task.diary_id = diary.id
 		@task.status = true
+		@task.spent_time = params[:spent_time]
 		@task.save
 		task = current_user.tasks.where(status: false).order(:position).first
 		render json: {content: task.content, id: task.id}

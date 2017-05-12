@@ -1,15 +1,15 @@
 <br>
 <ul id="tasks" class="list-group sortable-table">
 	<% @tasks.each do |task| %>
-		<li id="position_<%=task.position%>" class="list-group-item">
-      <%= task.content %>
-		  <%= link_to "削除", task, method: :delete, data:{confirm: "本当に削除しますか？"} %>
-      <%= link_to "完了", done_task_path(task.id), method: :patch, data:{confirm: "完了しますか？"} %>
+		<li id="position_<%=task.position%>" class="list-group-item sortable-item">
+      <h4 class="list-group-item-heading"><%= task.content %></h4>
+		  <p class="list-group-item-text"><%= link_to "削除", task, method: :delete, data:{confirm: "本当に削除しますか？"} %>
+      <%= link_to "完了", done_task_path(task.id), method: :patch, data:{confirm: "かかった時間を記録できませんが、完了しますか？"} %></p>
     </li>
 	<% end %>
 </ul>
 
-<%= form_for(@task,remote: true, html: {id: "task-form"}) do |f| %>
+<%= form_for(@task, remote: true, html: {id: "task-form"}) do |f| %>
 	<%= f.text_field :content, placeholder: "やるべきことを追加しよう！", autofocus: true %>
 	<%= f.submit "追加", class: "btn btn-primary" %>
 <% end %>

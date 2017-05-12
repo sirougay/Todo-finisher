@@ -6,6 +6,7 @@ class DiariesController < ApplicationController
   
   def show
     @diary = Diary.find(params[:id])
+    @tasks = @diary.tasks.where(status: true).order(:updated_at)
   end
 
   def index

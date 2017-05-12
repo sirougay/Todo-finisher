@@ -1,7 +1,7 @@
 <h1>ストップウォッチ</h1>
 <h2 id="timerStatus" data-pomodoro='<%=@timer.pomodoro%>' data-short-rest='<%=@timer.short_rest%>' data-long-rest='<%=@timer.long_rest%>'></h2>
 <% if user_signed_in? %>
-  <h3 id="current-task" data-task-content="<%=@task.content%>" data-task-id="<%=@task.id%>">
+  <h3 id="current-task">
   </h3>
 <% end %>
 <p id="timerText"><%=@timer.pomodoro/60%>分</p>
