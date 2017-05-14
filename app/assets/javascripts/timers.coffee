@@ -25,7 +25,23 @@ setRemainingTime = (status) ->
 
 pomodoroTimer = () ->
   TimeoutId = setTimeout ->
-    window.spentTime += 100
+    window.spentTime += 500
+    window.pomodoroTime += 500
+    if window.pomodoroTime >= 60000
+      console.log(window.pomodoroTime)
+      $.ajax({
+        type: 'POST',
+        url: '/diaries/' + gon.today_diary.id + '/pomodoro',
+        dataType: 'json',
+        data: {"pomodoro_time": window.pomodoroTime},
+        })
+        .done( () ->
+          console.log("success")
+          window.pomodoroTime = 0
+        ).fail () ->
+          console.log("error")
+          alert("ポモドーロを保存できませんでした")
+          window.pomodoroTime = 0
     setRemainingTime(window.pomodoro)
     if @remainingTime >= 60
       $('#timerText').html("#{@min}分 #{@sec}秒")
@@ -48,7 +64,7 @@ pomodoroTimer = () ->
         $('#timerStatus').removeClass("pomodoro-now")
         $('#timerStatus').addClass("short-rest")
         shortRestTimer()
-  , 100
+  , 500
   $(document).on 'click', '#stop' , () ->
     stopTimer(TimeoutId)
   $(document).on 'click', '#reset' , () ->
@@ -155,7 +171,7 @@ $(document).on 'ready turbolinks:load', () ->
     window.pomodoro = $('#timerStatus').data('pomodoro')
     window.shortRest =  $('#timerStatus').data('short-rest')
     window.longRest = $('#timerStatus').data('long-rest')
-    window.pomodoroCount = 0
+    window.pomodoroTime = 0
     window.restAudio = new Audio('/assets/se_maoudamashii_onepoint26.wav')
     window.startAudio = new Audio('/assets/se_maoudamashii_system23.wav')
     if window.spentTime is undefined

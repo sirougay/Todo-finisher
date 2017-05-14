@@ -2,14 +2,21 @@
 <ul id="tasks" class="list-group sortable-table">
 	<% @tasks.each do |task| %>
 		<li id="position_<%=task.position%>" class="list-group-item sortable-item">
-      <h4 class="list-group-item-heading"><%= task.content %></h4>
-		  <p class="list-group-item-text"><%= link_to "削除", task, method: :delete, data:{confirm: "本当に削除しますか？"} %>
-      <%= link_to "完了", done_task_path(task.id), method: :patch, data:{confirm: "かかった時間を記録できませんが、完了しますか？"} %></p>
+      <h4 class="list-group-item-heading" data-task-id="<%=task.id%>">
+        <%= task.content %>
+      </h4>
+		  <p class="list-group-item-text">
+        <a href="#" class="edit-task">編集</a>
+        <%= link_to "削除", task, method: :delete, data:{confirm: "本当に削除しますか？"}, remote: :true %>
+        <%= link_to "Done", done_task_path(task.id), method: :patch, data:{confirm: "かかった時間を記録できませんが、完了しますか？"} %>
+      </p>
     </li>
 	<% end %>
 </ul>
 
-<%= form_for(@task, remote: true, html: {id: "task-form"}) do |f| %>
-	<%= f.text_field :content, placeholder: "やるべきことを追加しよう！", autofocus: true %>
-	<%= f.submit "追加", class: "btn btn-primary" %>
+<%= form_for(@task, remote: true, html: {id: "task-form", class: "input-group" }) do |f| %>
+	<%= f.text_field :content, class: "form-control", placeholder: "やるべきことを追加しよう！", autofocus: true %>
+  <span class="input-group-btn">
+  	<%= f.submit "追加", class: "btn btn-primary" %>
+  </span>
 <% end %>

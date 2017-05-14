@@ -1,7 +1,7 @@
 class TasksController < ApplicationController
 	before_action :authenticate_user!
 	before_action :set_tasks, only:[:index, :sort, :create]
-	before_action :set_task, only:[:destroy, :done, :done_at_timer]
+	before_action :set_task, only:[:update, :destroy, :done, :done_at_timer]
 
 	def index
 		@task = Task.new
@@ -24,8 +24,17 @@ class TasksController < ApplicationController
 		@task = current_user.tasks.new(task_params)
 		@task.status = false
 		@task.position = @tasks.last.position + 1
+		if @task.save
+			render json: {content: @task.content, position: @task.position, id: @task.id}
+		else
+			render nothing: true, status: 400
+		end
+	end
+
+	def update
+		@task.content = params[:content]
 		@task.save
-		render json: {content: @task.content, position: @task.position, id: @task.id}
+		render json: {}
 	end
 
 	def destroy

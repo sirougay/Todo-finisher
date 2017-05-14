@@ -1,11 +1,11 @@
-<% if 1==2 %>
+<% unless @tasks.exists? %>
   <p>
     まだ本日の記録はありません。
   </p>
 <% else %>
 
   <h2>
-    完了したタスク
+    Doneリスト
   </h2>
   <% @tasks.each do |task| %>
     <p>
@@ -15,7 +15,7 @@
       <% end %>
     </p>
   <% end %>
-
+  <%= @diary.pomodoro_time / 60000 %>分
 <% end %>
 
 <%= form_for(@diary) do |f| %>

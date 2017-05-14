@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170508021418) do
+ActiveRecord::Schema.define(version: 20170513103527) do
 
   create_table "diaries", force: :cascade do |t|
     t.text     "content"
     t.integer  "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.integer  "pomodoro_time"
     t.index ["user_id"], name: "index_diaries_on_user_id"
   end
 

@@ -11,4 +11,5 @@ Rails.application.routes.draw do
   post "/tasks/sort" => "tasks#sort"
   patch "/tasks/:id/done" => "tasks#done", as: :done_task
   post "/tasks/:id/done_at_timer" => "tasks#done_at_timer"
+  post "/diaries/:id/pomodoro" => "diaries#record_pomodoro"
 end
