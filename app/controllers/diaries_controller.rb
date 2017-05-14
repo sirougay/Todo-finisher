@@ -7,7 +7,6 @@ class DiariesController < ApplicationController
   def show
     @diary = Diary.find(params[:id])
     @tasks = @diary.tasks.where(status: true).order(:updated_at)
-    @pomodoro = @diary.pomodoro_time % 60000
   end
 
   def index
