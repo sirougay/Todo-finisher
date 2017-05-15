@@ -36,7 +36,7 @@ gem 'jquery-ui-rails'
 gem 'acts_as_list'
 gem 'bootstrap-sass'
 gem 'gon'
-gem 'nokogiri', '1.7.2'
+gem 'nokogiri', '1.7.1'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
