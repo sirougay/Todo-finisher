@@ -7,7 +7,9 @@ class ApplicationController < ActionController::Base
       if user_signed_in?
         @today_diary = current_user.diaries.where(created_at: Time.now.all_day).first_or_create
         #Turbolinksによって値が失われないように、timersコントローラのshowアクションではなく、ここで定義する
-        gon.task = current_user.tasks.where(status: false).order(:position).first
+        if current_user.tasks.exists?
+          gon.task = current_user.tasks.where(status: false).order(:position).first
+        end
         gon.user_signed_in = true
         gon.today_diary = @today_diary
       else

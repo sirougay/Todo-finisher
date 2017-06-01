@@ -23,7 +23,11 @@ class TasksController < ApplicationController
 	def create
 		@task = current_user.tasks.new(task_params)
 		@task.status = false
-		@task.position = @tasks.last.position + 1
+		if @tasks.exists?
+			@task.position = @tasks.last.position + 1
+		else
+			@task.position = 0
+		end
 		if @task.save
 			render json: {content: @task.content, position: @task.position, id: @task.id}
 		else

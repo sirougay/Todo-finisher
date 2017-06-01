@@ -22,10 +22,16 @@ class TimersController < ApplicationController
 				if Timer.where(user_id: current_user.id).length > 0
 					@timer = current_user.timer
 				else
-					@timer = Timer.find(1)
+					@timer = Timer.new
+					@timer.pomodoro = 1500
+					@timer.short_rest = 300
+					@timer.long_rest = 900
 				end
 			else
-				@timer = Timer.find(1)
+				@timer = Timer.new
+				@timer.pomodoro = 1500
+				@timer.short_rest = 300
+				@timer.long_rest = 900
 			end
 		end
 

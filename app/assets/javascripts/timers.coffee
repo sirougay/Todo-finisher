@@ -1,3 +1,43 @@
+window.AudioContext = window.AudioContext or window.webkitAudioContext;
+context = new AudioContext()
+
+# Audio 用の buffer を読み込む
+getAudioBuffer = (url, fn) ->
+  req = new XMLHttpRequest()
+  req.responseType = 'arraybuffer'
+  req.onreadystatechange = () ->
+    if req.readyState is 4
+      if req.status is 0 or req.status is 200
+        # array buffer を audio buffer に変換
+        context.decodeAudioData req.response, (buffer) ->
+          fn buffer
+  req.open('GET', url, true)
+  req.send('')
+
+# サウンドを再生
+playSound = (buffer) ->
+  # source を作成
+  source = context.createBufferSource()
+  # buffer をセット
+  source.buffer = buffer
+  # context に connect
+  source.connect(context.destination)
+  # 再生
+  source.start()
+
+loadAudio = () ->
+  #サウンドを読み込む
+  getAudioBuffer '/assets/se_maoudamashii_onepoint26.wav', (buffer) ->
+    #読み込み完了後にイベントを登録
+    window.restAudio = () ->
+      #サウンドを再生
+      playSound(buffer);
+  getAudioBuffer '/assets/se_maoudamashii_system23.wav', (buffer) ->
+    #読み込み完了後にイベントを登録
+    window.startAudio = () ->
+      #サウンドを再生
+      playSound(buffer);
+
 stopTimer = (TimeoutId) ->
   window.stopTime = Date.now()
   clearTimeout(TimeoutId)
@@ -27,21 +67,22 @@ pomodoroTimer = () ->
   TimeoutId = setTimeout ->
     window.spentTime += 500
     window.pomodoroTime += 500
-    if window.pomodoroTime >= 60000
-      console.log(window.pomodoroTime)
-      $.ajax({
-        type: 'POST',
-        url: '/diaries/' + gon.today_diary.id + '/pomodoro',
-        dataType: 'json',
-        data: {"pomodoro_time": window.pomodoroTime},
-        })
-        .done( () ->
-          console.log("success")
-          window.pomodoroTime = 0
-        ).fail () ->
-          console.log("error")
-          alert("ポモドーロを保存できませんでした")
-          window.pomodoroTime = 0
+    if gon.user_signed_in
+      if window.pomodoroTime >= 60000
+        console.log(window.pomodoroTime)
+        $.ajax({
+          type: 'POST',
+          url: '/diaries/' + gon.today_diary.id + '/pomodoro',
+          dataType: 'json',
+          data: {"pomodoro_time": window.pomodoroTime},
+          })
+          .done( () ->
+            console.log("success")
+            window.pomodoroTime = 0
+          ).fail () ->
+            console.log("error")
+            alert("ポモドーロを保存できませんでした")
+            window.pomodoroTime = 0
     setRemainingTime(window.pomodoro)
     if @remainingTime >= 60
       $('#timerText').html("#{@min}分 #{@sec}秒")
@@ -52,7 +93,8 @@ pomodoroTimer = () ->
     else if @remainingTime <= 0
       window.startTime = Date.now()
       window.pomodoroCount += 1
-      window.restAudio.play()
+      console.log(window.pomodoroCount)
+      window.restAudio()
       clearTimeout(TimeoutId)
       if window.pomodoroCount % 4 is 0
         $('#timerStatus').html("大休憩")
@@ -89,7 +131,7 @@ shortRestTimer = () ->
       shortRestTimer()
     else if remainingTime <= 0
       window.startTime = Date.now()
-      window.startAudio.play()
+      window.startAudio()
       clearTimeout(TimeoutId)
       $('#timerStatus').html("作業中")
       $('#timerStatus').removeClass("short-rest")
@@ -120,7 +162,7 @@ longRestTimer = () ->
       longRestTimer()
     else if remainingTime <= 0
       window.startTime = Date.now()
-      window.startAudio.play()
+      window.startAudio()
       clearTimeout(TimeoutId)
       $('#timerStatus').html("作業中")
       $('#timerStatus').removeClass("long-rest")
@@ -155,7 +197,7 @@ $(document).on 'click', '#start' , () ->
   else
     $('#timerStatus').html("作業中")
     $('#timerStatus').addClass("pomodoro-now")
-    window.startAudio.play()
+    window.startAudio()
     pomodoroTimer()
   # 開始ボタンを一時停止ボタンにする
   $('#start').html("一時停止")
@@ -171,13 +213,16 @@ $(document).on 'ready turbolinks:load', () ->
     window.pomodoro = $('#timerStatus').data('pomodoro')
     window.shortRest =  $('#timerStatus').data('short-rest')
     window.longRest = $('#timerStatus').data('long-rest')
+    # short_restとlong_restの判別に使用
+    window.pomodoroCount = 0
+    # 作業時間の計測に使用
     window.pomodoroTime = 0
-    window.restAudio = new Audio('/assets/se_maoudamashii_onepoint26.wav')
-    window.startAudio = new Audio('/assets/se_maoudamashii_system23.wav')
+    loadAudio()
     if window.spentTime is undefined
       window.spentTime = 0
     if gon.user_signed_in
-      $('#current-task').append("現在のタスク: " + gon.task.content)
+      unless gon.task.content is undefined
+        $('#current-task').append("現在のタスク: " + gon.task.content)
       $('#end').removeClass("hidden")
 
 $(document).on 'click', '#end', () ->
@@ -189,7 +234,7 @@ $(document).on 'click', '#end', () ->
       dataType: 'json',
       data: {
         "spent_time": window.spentTime
-      }, 
+      },
       success: (data) ->
         $('#current-task').html("現在のタスク: " + data['content'])
         gon.task.id = data['id']
